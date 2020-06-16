@@ -4,19 +4,38 @@ const cpu = osu.cpu;
 const mem = osu.mem;
 const os = osu.os;
 
+let cpuOverload = 5;
+
+notifyUser({
+  title: "SysTop Detected a CPU Overload",
+  body: `CPU is over ${cpuOverload}%`,
+  icon: path.join(__dirname, "img", "icon.png"),
+});
+
 const cpuUsage = document.getElementById("cpu-usage");
 const cpuFree = document.getElementById("cpu-free");
 const sysUptime = document.getElementById("sys-uptime");
+const progressBar = document.getElementById("cpu-progress");
 
-// Show Loading... before CPU usage is listed
+// Show Loading... before CPU usage is listed - init progress bar at 0
 cpuUsage.innerText = "Loading...";
 cpuFree.innerText = "Loading...";
+progressBar.style.width = 0 + "%";
 
 // Check CPU usage every 2 seconds
 setInterval(() => {
   // CPU usage
   cpu.usage().then((info) => {
     cpuUsage.innerText = info.toFixed(2) + "%";
+
+    progressBar.style.width = info + "%";
+
+    // Make progress bar red if overload
+    if (info >= cpuOverload) {
+      progressBar.style.background = "red";
+    } else {
+      progressBar.style.background = "#30c88b";
+    }
   });
   // CPU free
   cpu.free().then((info) => {
@@ -66,4 +85,9 @@ function secondsToDhms(seconds) {
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
   return `${d}d, ${h}h, ${m}m, ${s}s`;
+}
+
+// Send notification
+function notifyUser(options) {
+  new Notification(options.title, options);
 }
