@@ -1,4 +1,7 @@
+const { ipcRenderer } = require("electron");
+
 const settingsForm = document.getElementById("settings-form");
+const nav = document.getElementById("nav");
 
 // Get default settings
 ipcRenderer.on("settings:get", (e, settings) => {
@@ -30,3 +33,9 @@ function showAlert(msg) {
 
   setTimeout(() => alert.classList.add("hide"), 3000);
 }
+
+// Toggle nav through menu
+ipcRenderer.on("nav:toggle", () => {
+  nav.classList.toggle("hide");
+  console.log("yo");
+});
